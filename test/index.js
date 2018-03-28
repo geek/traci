@@ -79,6 +79,38 @@ describe('traci', () => {
     expect(report.spans[3]._logs[1].fields.stack).to.contain('foo');
   });
 
+  it('handles internal reroutes using server.inject (decorated request)', async () => {
+    const server = new Hapi.Server();
+    await server.register({
+      plugin: Traci,
+      options: {
+        tracer: new MockTracer()
+      }
+    });
+
+    server.route([
+      {
+        method: 'get',
+        path: '/',
+        handler: async (request, h) => {
+          const res = await request.server.inject('/reroute');
+          return res.payload;
+        }
+      },
+      {
+        method: 'get',
+        path: '/reroute',
+        handler: (request, h) => {
+          return 'foo';
+        }
+      }
+    ]);
+
+    await server.inject('/');
+    const report = server.tracer.report();
+    expect(report.unfinishedSpans.length).to.equal(0);
+  });
+
   it('a log span is created when logging is performed', async () => {
     const server = new Hapi.Server();
     await server.register({
