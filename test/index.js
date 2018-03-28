@@ -39,6 +39,21 @@ describe('traci', () => {
     expect(report.debugSpans[0].operation).to.equal('hapi_request');
   });
 
+  it('works correctly on a not found route', async () => {
+    const server = new Hapi.Server();
+    await server.register({
+      plugin: Traci,
+      options: {
+        tracer: new MockTracer()
+      }
+    });
+
+    await server.inject('/');
+    const report = server.tracer.report();
+    expect(report.unfinishedSpans.length).to.equal(0);
+    expect(report.debugSpans[0].operation).to.equal('hapi_request');
+  });
+
   it('creates an error span for an error response', async () => {
     const server = new Hapi.Server();
     await server.register({
