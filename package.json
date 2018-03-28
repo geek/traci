@@ -1,0 +1,32 @@
+{
+  "name": "traci",
+  "version": "0.0.0",
+  "description": "hapi open tracing plugin",
+  "main": "lib",
+  "scripts": {
+    "lint": "belly-button",
+    "pretest": "npm run lint",
+    "test": "lab -t 100",
+    "test-cov-html": "lab -t 100 -r html -o coverage.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geek/traci.git"
+  },
+  "keywords": [],
+  "author": "wyatt",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/geek/traci/issues"
+  },
+  "homepage": "https://github.com/geek/traci#readme",
+  "dependencies": {
+    "opentracing": "0.14.x"
+  },
+  "devDependencies": {
+    "belly-button": "4.x.x",
+    "code": "5.x.x",
+    "hapi": "17.x.x",
+    "lab": "15.x.x"
+  }
+}
