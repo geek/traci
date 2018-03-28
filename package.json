@@ -1,6 +1,6 @@
 {
   "name": "traci",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "hapi open tracing plugin",
   "main": "lib",
   "scripts": {
