@@ -111,9 +111,10 @@ describe('traci', () => {
     ]);
 
     await server.inject('/');
+    await server.inject('/reroute');
     const report = server.tracer.report();
     expect(report.unfinishedSpans.length).to.equal(0);
-    expect(report.spans.length).to.equal(9);
+    expect(report.spans.length).to.equal(14);
   });
 
   it('will not finish a span that is already marked as finished', async () => {
@@ -138,7 +139,8 @@ describe('traci', () => {
         method: 'get',
         path: '/reroute',
         handler: (request, h) => {
-          request.spans.parentRequest._duration = 10;
+          const spanKey = Object.keys(request.spans)[0];
+          request.spans[spanKey]._duration = 10;
           return 'foo';
         }
       }
