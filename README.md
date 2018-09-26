@@ -11,7 +11,16 @@ hapi open tracing plugin
 
 ## Properties
 
-Decorates the hapi server object with `.tracer`, which is an instance of the intialized Tracer class. This can be used to create spans and reports.
+Decorates the hapi server object with `.tracer`, which is an instance of the intialized Tracer class. This can be used to create spans and reports. To access a parent span of one of the following types you can use the new `request.span(type)` method to return the current span of whatever type you care about. For example, to create a new span in a request handler using the parent handler span you can invoke `request.span` as follows:
+
+```js
+handler: (request, h) => {
+  const span = request.server.tracer.startSpan('some_action', { childOf: request.span('handler').context() });
+  const something = await someAction();
+  span.finish();
+  return something;
+}
+```
 
 The following spans are created:
 

@@ -103,6 +103,8 @@ describe('traci', () => {
         method: 'get',
         path: '/reroute',
         handler: (request, h) => {
+          const span = request.server.tracer.startSpan('reroute', { childOf: request.span('handler').context() });
+          span.finish();
           return 'foo';
         }
       }
@@ -111,7 +113,7 @@ describe('traci', () => {
     await server.inject('/');
     const report = server.tracer.report();
     expect(report.unfinishedSpans.length).to.equal(0);
-    expect(report.spans.length).to.equal(8);
+    expect(report.spans.length).to.equal(9);
   });
 
   it('will not finish a span that is already marked as finished', async () => {
