@@ -20,3 +20,5 @@ The following spans are created:
 - `hapi_handler`
 - `hapi_response`
 - `hapi_log`
+
+Inside of a handler you can obtain the parent span by invoking `request.span()`
