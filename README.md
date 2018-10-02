@@ -8,6 +8,11 @@ hapi open tracing plugin
 ## Options
 
 - `tracer` - instance of OpenTracing.Tracer, defaults to OpenTracing.Tracer base class
+- `onRequest` - array of properties to select from the hapi `request` object and include in the hapi_request span log. Defaults to `['headers', 'info']`
+- `onPostAuth` - array of properties to select from the hapi `request` object and include in the hapi_auth span log. Defaults to `['auth']`
+- `onPreHandler` - array of properties to select from the hapi `request` object and include in the hapi_handler span log. Defaults to `['route.settings.handler.name']`
+- `onPreResponse` - array of properties to select from the hapi `request` object and include in the hapi_response span log. Defaults to `['info']`
+
 
 ## Properties
 

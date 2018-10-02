@@ -229,4 +229,43 @@ describe('traci', () => {
     expect(report.unfinishedSpans.length).to.equal(0);
     expect(report.spans[1]._logs[1].fields.auth.credentials.user).to.equal('test');
   });
+
+  it('can override logged properties for onPostAuth', async () => {
+    const server = new Hapi.Server();
+    await server.register({
+      plugin: Traci,
+      options: {
+        tracer: new MockTracer(),
+        onPostAuth: ['auth.credentials.user']
+      }
+    });
+
+    server.auth.scheme('testauth', function (server) {
+      return {
+        authenticate: function (request, h) {
+          return h.authenticated({ credentials: { user: 'test' } });
+        }
+      };
+    });
+
+    server.auth.strategy('testauth', 'testauth');
+
+    server.route([
+      {
+        method: 'get',
+        path: '/',
+        config: {
+          auth: 'testauth',
+          handler: (request, h) => {
+            return { foo: 'bar' };
+          }
+        }
+      }
+    ]);
+
+    await server.inject('/');
+    const report = server.tracer.report();
+    expect(report.unfinishedSpans.length).to.equal(0);
+    expect(report.spans[1]._logs[1].fields.user).to.equal('test');
+  });
 });
