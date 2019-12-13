@@ -1,8 +1,8 @@
 'use strict';
 
-const Lab = require('lab');
-const { expect } = require('code');
-const Hapi = require('hapi');
+const Lab = require('@hapi/lab');
+const { expect } = require('@hapi/code');
+const Hapi = require('@hapi/hapi');
 const { MockTracer } = require('opentracing/lib/mock_tracer'); // because opentracing doesn't like to do releases
 const Traci = require('../');
 
@@ -33,6 +33,7 @@ describe('traci', () => {
       }
     });
 
+    await server.initialize();
     await server.inject('/');
     const report = server.tracer.report();
     expect(report.unfinishedSpans.length).to.equal(0);
@@ -139,8 +140,8 @@ describe('traci', () => {
         method: 'get',
         path: '/reroute',
         handler: (request, h) => {
-          const spanKey = Object.keys(request.spans)[0];
-          request.spans[spanKey]._duration = 10;
+          const spanKey = Object.keys(request.plugins.traci.spans)[0];
+          request.plugins.traci.spans[spanKey]._duration = 10;
           return 'foo';
         }
       }
