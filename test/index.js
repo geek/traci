@@ -40,6 +40,78 @@ describe('traci', () => {
     expect(report.debugSpans[0].operation).to.equal('hapi_request');
   });
 
+  it('a http trace header is set as the parent span ID', async () => {
+    let extracted = false;
+    const tracer = new MockTracer();
+    const parentSpan = tracer.startSpan('parent');
+
+    tracer.__proto__.extract = function () { // eslint-disable-line no-proto
+      tracer.__proto__.extract = undefined; // eslint-disable-line no-proto
+      extracted = true;
+      return parentSpan.context();
+    };
+
+    tracer.__proto__.inject = function (span, format, headers) { // eslint-disable-line no-proto
+      expect(span._uuid).to.equal(parentSpan._uuid);
+    };
+
+    const server = new Hapi.Server();
+    await server.register({
+      plugin: Traci,
+      options: {
+        tracer
+      }
+    });
+
+    server.route({
+      method: 'get',
+      path: '/',
+      handler: (request, h) => {
+        return h.response({ foo: 'bar' });
+      }
+    });
+
+    await server.initialize();
+    await server.inject({
+      url: '/',
+      headers: {
+        'uber-trace-id': parentSpan._uuid
+      }
+    });
+    expect(extracted).to.be.true();
+  });
+
+  it('when unable to extract parent span from http header there isn\'t a parent', async () => {
+    let extracted = false;
+    const tracer = new MockTracer();
+
+    tracer.__proto__.extract = function () { // eslint-disable-line no-proto
+      tracer.__proto__.extract = undefined; // eslint-disable-line no-proto
+      extracted = true;
+      return null;
+    };
+
+    const server = new Hapi.Server();
+    await server.register({
+      plugin: Traci,
+      options: {
+        tracer
+      }
+    });
+
+    server.route({
+      method: 'get',
+      path: '/',
+      handler: (request, h) => {
+        return h.response({ foo: 'bar' });
+      }
+    });
+
+    await server.initialize();
+    await server.inject('/');
+    expect(extracted).to.be.true();
+  });
+
   it('works correctly on a not found route', async () => {
     const server = new Hapi.Server();
     await server.register({
@@ -140,8 +212,7 @@ describe('traci', () => {
         method: 'get',
         path: '/reroute',
         handler: (request, h) => {
-          const spanKey = Object.keys(request.plugins.traci.spans)[0];
-          request.plugins.traci.spans[spanKey]._duration = 10;
+          request.plugins.traci.spans.values().next().value._duration = 10;
           return 'foo';
         }
       }

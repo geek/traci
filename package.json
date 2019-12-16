@@ -6,8 +6,8 @@
   "scripts": {
     "lint": "belly-button",
     "pretest": "npm run lint",
-    "test": "lab -t 96",
-    "test-cov-html": "lab -t 96 -r html -o coverage.html"
+    "test": "lab -t 100",
+    "test-cov-html": "lab -t 100 -r html -o coverage.html"
   },
   "repository": {
     "type": "git",
