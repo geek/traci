@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/geek/traci#readme",
   "dependencies": {
-    "@hapi/hoek": "9.0.x",
-    "opentracing": "0.14.x"
+    "opentracing": "0.14.x",
+    "reach": "1.0.x"
   },
   "devDependencies": {
     "@hapi/code": "8.x.x",
